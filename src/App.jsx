@@ -1,11 +1,13 @@
-/* eslint-disable no-unused-vars */
+//imports
 
-
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import {useEffect, useMemo, useState } from "react";
 import MonkImg from "./assets/sage.png";
 import CodingChar from "/codingchar.png";
 import LoginModal from "./login.jsx";
 import SignupForm from "./SignupForm.jsx";
+import Roadmap from "./RoadMap";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import React from "react";
 
 
 
@@ -36,7 +38,7 @@ export default function MargaDarshakApp() {
   const [showMenu, setShowMenu] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  
+
   
   // NEW: Settings + Theme state (persisted)
   const [showSettings, setShowSettings] = useState(false);
@@ -86,17 +88,17 @@ useEffect(() => {
       setMentorNotes(data.md_notes || []);
       setActiveQuestId(data.md_activeQuestId || '');
       setCompleted(data.md_completed || {});
-    } catch (error) {
-      console.error("Failed to load state on init:", error);
-
-      // Fallback to defaults if backend fetch fails
-      setGems(0);
-      setLevel(1);
-      setXp(0);
-      localStorage.setItem("md_gems", 0);
-      localStorage.setItem("md_level", 1);
-      localStorage.setItem("md_xp", 0);
-    }
+    } catch {
+        console.error("Failed to load state on init");
+  
+        // Fallback to defaults if backend fetch fails
+        setGems(0);
+        setLevel(1);
+        setXp(0);
+        localStorage.setItem("md_gems", 0);
+        localStorage.setItem("md_level", 1);
+        localStorage.setItem("md_xp", 0);
+      }
   })();
 }, []);
 
@@ -272,7 +274,7 @@ useEffect(() => {
     };
     return base;
   }
-
+  
 
   // Evolve avatar on milestone levels
   useEffect(() => {
@@ -292,19 +294,7 @@ useEffect(() => {
   function cryptoId() { return Math.random().toString(36).slice(2, 9); }
   function fmt(n) { return new Intl.NumberFormat().format(n); }
 
-  function saveUserStateToBackend(newGems, newLevel, newXp) {
-  const userId = localStorage.getItem("md_userId");
-  if (!userId) return; 
-  fetch(`http://localhost:4000/api/state/${userId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      md_gems: newGems,
-      md_level: newLevel,
-      md_xp: newXp,
-    }),
-  }).catch(console.error);
-}
+// (removed duplicate saveUserStateToBackend)
 
   function resetAll() {
     if (!window.confirm("This will reset your MargaDarshak journey.")) return;
@@ -325,27 +315,34 @@ useEffect(() => {
 
   // ---------------------- Actions ----------------------
 
-  // completing quest reward update to backend
-  function onQuestComplete(reward) {
-  // Here, reward.gems and reward.xp are numbers
-  setGems(prev => {
-    const updatedGems = prev + reward.gems;
+// (Removed unused onQuestComplete function)
 
-    // Sync gems to backend after state update
-    const userId = localStorage.getItem("md_userId");
-    if (userId) {
-      fetch(`http://localhost:4000/api/state/${userId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ md_gems: updatedGems }), // Only update gems (or add more fields as needed)
-      });
-    }
+function App() {
+  const navigate = useNavigate();
 
-    return updatedGems;
-  });
+  return (
+    <>
+      {/* Your custom header/menu */}
+      <div className="header-menu">
+        <button onClick={() => navigate("/roadmap")}>Road Map</button>
+        {/* add other buttons here similarly */}
+      </div>
 
-  // Likewise for XP/level, and send those to backend as needed too.
+      {/* Routing */}
+      <Routes>
+        {/* Add your other routes here */}
+        <Route path="/roadmap" element={<Roadmap />} />
+        {/* Add a default or home route */}
+        <Route path="/" element={<HomePage />} />
+      </Routes>
+    </>
+  );
 }
+function HomePage() {
+  return <div>Welcome Home</div>;
+}
+
+
     
     // multiple updates of reward to backend
 function saveUserStateToBackend(newGems, newLevel, newXp) {
@@ -398,6 +395,35 @@ function claimReward(q) {
 
 
 
+function resetUserState() {
+  setGems(0);
+  setLevel(1);
+  setXp(0);
+  setBadges([]);
+  setInventory([]);
+  setMentorNotes([]);
+  setActiveQuestId('');
+  setCompleted({});
+  setAvatar(null);
+  setDomain('');
+  
+  setLoggedInUser(null);
+  setView('landing');  // or whatever is your initial screen
+
+  // Clear relevant localStorage keys
+  localStorage.removeItem('md_gems');
+  localStorage.removeItem('md_level');
+  localStorage.removeItem('md_xp');
+  localStorage.removeItem('md_badges');
+  localStorage.removeItem('md_inv');
+  localStorage.removeItem('md_notes');
+  localStorage.removeItem('md_activeQuestId');
+  localStorage.removeItem('md_completed');
+  localStorage.removeItem('md_avatar');
+  localStorage.removeItem('md_domain');
+  localStorage.removeItem('username');
+  localStorage.removeItem('md_userId');  // Optional, if you want to clear user session completely
+}
 
 
 
@@ -519,7 +545,7 @@ async function handleLoginSuccess(username, userId) {
     setLevel(data.md_level || 1);
     localStorage.setItem("md_gems", data.md_gems || 0);
     localStorage.setItem("md_level", data.md_level || 1);
-  } catch (error) {
+  } catch {
     setGems(0);
     setLevel(1);
     localStorage.setItem("md_gems", 0);
@@ -532,16 +558,7 @@ async function handleLoginSuccess(username, userId) {
 
 
   
-  // Optional: logout function to clear user data
-function handleLogout() {
-  setLoggedInUser(null);
-  setGems(0);
-  setLevel(1);
-  localStorage.removeItem("md_username");
-  localStorage.removeItem("md_userId");
-  localStorage.setItem("md_gems", 0);
-  localStorage.setItem("md_level", 1);
-}
+
 
 
 
@@ -556,7 +573,6 @@ function HeaderBar({
   showMenu,
   setShowMenu,
   loggedInUser,
-  setLoggedInUser,
   showLoginModal,
   setShowLoginModal,
   handleLoginSuccess,
@@ -564,6 +580,7 @@ function HeaderBar({
   level,
   fmt
 }) {
+  
   return (
     <header className="topbar">
       <div className="left-group">
@@ -601,21 +618,21 @@ function HeaderBar({
               <button className="reset-btn" onClick={resetAll}>Reset Journey</button>
             </div>
             {loggedInUser && (
-              <div className="settings-row">
-                <button
-                  className="reset-btn"
-                  onClick={() => {
-                    setLoggedInUser(null);
-                    try { localStorage.removeItem('md_username'); } catch {}
-                    setShowSettings(false);
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
+            <div className="settings-row">
+              <button
+                className="reset-btn"
+                onClick={() => {
+                  resetUserState();        // your function to clear all user state and localStorage
+                  setShowSettings(false);
+                }}
+              >
+                Logout
+              </button>
+            </div>
             )}
+
           </div>
-        )}
+        ) }
       </div>
 
       <nav className={"nav " + (showMenu ? "show" : "")}>
@@ -623,7 +640,8 @@ function HeaderBar({
         <button className="nav-btn" onClick={() => setView("quests")}>Quest Arena</button>
         <button className="nav-btn" onClick={() => setView("rewards")}>Rewards & Inventory</button>
         <button className="nav-btn" onClick={() => setView("mentor")}>Mentor Chamber</button>
-
+        <button className="nav-btn" onClick={() => setView("Road Map")}>Road Map</button>
+        
         {loggedInUser ? (
           <span
             style={{
@@ -689,7 +707,7 @@ function HeaderBar({
           <img src={MonkImg} alt="Monk avatar" className="monk" width="200" height="200" />
           <div className="hero-copy">
             <h1 className="title glow">MargaDarshak</h1>
-            <p className="subtitle">Your Indoâ€“Japanese RPG journey to career mastery.</p>
+            <p className="subtitle">.</p>
             <button className="cta" onClick={() => setView("choose")}>Start Your Quest</button>
           </div>
         </div>
@@ -730,7 +748,7 @@ function HeaderBar({
           </div>
         </div>
         <div className="scrolls">
-          {list.map((s, _i) => (
+          {list.map((s) => (
             <article key={s.k} className="scroll-card">
               <h3>{s.k}</h3>
               <p>{s.d}</p>
@@ -1029,31 +1047,25 @@ return (
 
         {/* HeaderBar with all required props */}
         <HeaderBar
-          showSettings={showSettings}
-          setShowSettings={setShowSettings}
-          theme={theme}
-          setTheme={setTheme}
-          resetAll={resetAll}
-          setView={setView}
-          showMenu={showMenu}
-          setShowMenu={setShowMenu}
-          loggedInUser={loggedInUser}
-          setLoggedInUser={setLoggedInUser}
-          showLoginModal={showLoginModal}
-          setShowLoginModal={setShowLoginModal}
-          handleLoginSuccess={handleLoginSuccess}
-          gems={gems}
-          level={level}
-          fmt={fmt}
-        />
-
-        {/* Removed duplicate manual welcome/login toggle here */}
+        showSettings={showSettings}
+        setShowSettings={setShowSettings}
+        theme={theme}
+        setTheme={setTheme}
+        resetAll={resetAll}
+        setView={setView}
+        showMenu={showMenu}
+        setShowMenu={setShowMenu}
+        loggedInUser={loggedInUser}
+        showLoginModal={showLoginModal}
+        setShowLoginModal={setShowLoginModal}
+        handleLoginSuccess={handleLoginSuccess}
+        gems={gems}
+        level={level}
+        fmt={fmt}
+      />
 
         <main className="main">
-          {/* Insert SignupForm conditionally here */}
-          {view === "signup" && <SignupForm />}
-
-          {/* Existing screen views */}
+          {/* Insert SignupForm conditionally */}
           {view === "signup" && <SignupForm />}
           {view === "landing" && <ScreenLanding />}
           {view === "choose" && <ScreenChoose />}
@@ -1062,45 +1074,179 @@ return (
           {view === "challenge" && <ScreenChallenge />}
           {view === "rewards" && <ScreenRewards />}
           {view === "mentor" && <ScreenMentor />}
+          
+
         </main>
 
         <footer className="footer">
           <div className="left">
-            <button className="link" onClick={() => setView("choose")}>Change Domain</button>
-            <button className="link" onClick={() => setView("quests")}>Arena</button>
-            <button className="link" onClick={() => setView("vedhas")}>Vedhas</button>
+            <button className="link" onClick={() => setView("choose")}>
+              Change Domain
+            </button>
+            <button className="link" onClick={() => setView("quests")}>
+              Arena
+            </button>
+            <button className="link" onClick={() => setView("vedhas")}>
+              Vedhas
+            </button>
           </div>
           <div className="right">
-            <button className="reset-btn reset-btn--fixed" onClick={resetAll}>Reset Journey</button>
+            <button className="reset-btn reset-btn--fixed" onClick={resetAll}>
+              Reset Journey
+            </button>
           </div>
         </footer>
 
         {showHint && (
           <div className="modal" onClick={() => setShowHint(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="modal-content"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h3>Secret Revealed</h3>
               <p>{mentorNotes?.text}</p>
-              <button className="primary" onClick={() => setShowHint(false)}>Close</button>
+              <button className="primary" onClick={() => setShowHint(false)}>
+                Close
+              </button>
             </div>
           </div>
         )}
       </div>
-    </div>
 
-    {/* Single LoginModal component with proper props and handler */}
+      {/* Mobile Menu - slide down */}
+      {showMenu && (
+        <div
+          className="mobile-menu"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(26, 24, 22, 0.95)",
+            zIndex: 3000,
+            display: "flex",
+            flexDirection: "column",
+            padding: "100px 70px 50px 70px",
+            boxSizing: "border-box",
+          }}
+        >
+          <button
+            className="close-btn"
+            onClick={() => setShowMenu(false)}
+            style={{
+              position: "absolute",
+              top: '5%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              fontSize: 28,
+              color: "#fff",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              zIndex: 3010,
+            }}
+          >
+            ✕
+          </button>
+          <button
+            className="nav-btn"
+            onClick={() => {
+              setShowMenu(false);
+              setView("vedhas");
+            }}
+          >
+            Vedhas
+          </button>
+          <button
+            className="nav-btn"
+            onClick={() => {
+              setShowMenu(false);
+              setView("quests");
+            }}
+          >
+            Quest Arena
+          </button>
+          <button
+            className="nav-btn"
+            onClick={() => {
+              setShowMenu(false);
+              setView("rewards");
+            }}
+          >
+            Rewards
+          </button>
+          <button
+            className="nav-btn"
+            onClick={() => {
+              setShowMenu(false);
+              setView("mentor");
+            }}
+          >
+            Mentor
+          </button>
+          <button
+            className="nav-btn"
+            onClick={() => {
+              setShowMenu(false);
+              setView("Road Map");
+            }}
+          >
+            Road Map
+          </button>
+          <hr style={{ margin: "8px 0", borderColor: "#333", opacity: 0.3 }} />
+          <button
+            className="settings-btn"
+            onClick={() => {
+              setShowMenu(false);
+              setShowSettings(true);
+            }}
+            style={{
+              margin: "10px 0",
+              background: "none",
+              border: "none",
+              color: "white",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Settings
+          </button>
+          <button
+            className="reset-btn"
+            onClick={() => {
+              setShowMenu(false);
+              if (window.confirm("Are you sure you want to reset your journey?")) {
+                resetAll();
+              }
+            }}
+            style={{
+              backgroundColor: "#8b1c1c",
+              color: "white",
+              padding: "10px",
+              borderRadius: "8px",
+              border: "none",
+              marginTop: "10px",
+              cursor: "pointer",
+            }}
+          >
+            Reset Journey
+          </button>
+        </div>
+      )}
+
+      
+    </div>
     <LoginModal
-      visible={showLoginModal}
-      onClose={() => setShowLoginModal(false)}
-      onLoginSuccess={handleLoginSuccess}
-    />
+        visible={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
   </>
 );
 
-
-
-
-
 }
+
 
 
 // ---------------------- Styles (No external CSS) ----------------------
@@ -1618,7 +1764,39 @@ button.ghost:hover {
   font-size: 1.1rem;
   text-align: center;
 }
+/* Desktop view - wide screens */
+@media (min-width: 1200px) {
+  .nav {
+    display: flex !important; /* show nav buttons */
+    gap: 12px;
+    align-items: center;
+  }
+  .hamburger {
+    display: none !important; /* hide hamburger menu */
+  }
+}
 
+/* Mobile / small window view */
+@media (max-width: 899px) {
+  .nav {
+    display: none !important; /* hide nav buttons */
+  }
+  .hamburger {
+    display: block !important; /* show hamburger menu */
+  }
+}
+
+/* Desktop: show nav, hide hamburger */
+@media (min-width: 900px) {
+  .nav { display: flex !important; }
+  .hamburger { display: none !important; }
+}
+
+/* Mobile/tablet: hide nav, show hamburger */
+@media (max-width: 899px) {
+  .nav { display: none !important; }
+  .hamburger { display: block !important; }
+}
 
 
     `}</style>

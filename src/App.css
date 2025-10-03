@@ -1,65 +1,297 @@
-/* Root container kept neutral; layout handled inside the app's StyleTag */
+/* Root Styles */
+
 #root {
-  max-width: none;          /* let .main control width */
+  max-width: none; /* let main control width */
   margin: 0 auto;
-  padding: 0;               /* avoid double padding with .main */
-  text-align: initial;      /* do not force center text globally */
+  padding: 0;
+  text-align: initial;
 }
-/* Normal app view */
+
 #app-root {
   transition: filter 0.3s ease-in-out;
 }
 
-/* When modal is open, apply blur */
+/* Blur effect when modal is open */
 .blur-background {
   filter: blur(16px);
-  pointer-events: none; /* Optional: disable interaction */
-  user-select: none; /* Optional: disable text selection */
+  pointer-events: none;
+  user-select: none;
 }
 
-
-/* Logo from starter template, kept intact */
+/* Logo Styles */
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em rgba(100, 108, 255, 0.67));
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em rgba(97, 218, 251, 0.67));
 }
 
-/* Keep demo spin animation */
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Logo Spin Animation */
+@keyframes  logo-spin {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(360deg);}
 }
 
-/* Respect reduced-motion preference */
+/* Applies animation respecting user preferences */
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
 }
 
-/* Generic card wrapper; does not override component cards */
+/* Card Styling */
 .card {
   padding: 2em;
   background: transparent;
   border: 0;
 }
 
-/* Docs helper text uses the app’s muted color variable */
-.read-the-docs {
+/* Muted Text */
+.read-docs {
   color: var(--muted);
 }
 
+/* ---------------- Responsive Styles ---------------- */
 
+/* Mobile Styles - Phones (max-width 599px) */
+@media (max-width: 599px) {
 
+  /* General */
+  body, #root, #app-root {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  /* Logo resize */
+  .logo {
+    height: 4em;
+    padding: 1em;
+  }
+
+  /* Mobile Header */
+  .mobile-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    padding: 12px 0;
+    background: none;
+    border-bottom: 1px solid #444;
+    z-index: 101;
+  }
+
+  /* Brand in mobile */
+  .brand {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.4rem;
+    margin: 0 auto;
+    color: white;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Hamburger Menu */
+  .hamburger {
+    display: block !important;
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 102;
+    background: none;
+    color: var(--gold);
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 6px 12px;
+  }
+
+  /* Mobile sliding menu */
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(26, 24, 22, 0.95);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    padding: 36px 18px 18px 18px;
+    box-sizing: border-box;
+  }
+
+  /* Close button on menu */
+  .close-btn {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    font-size: 2rem;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    z-index: 2111;
+  }
+
+  /* Mobile nav buttons and login button */
+  .nav-btn, .login-btn, .settings-btn {
+    width: 100%;
+    padding: 14px 0;
+    font-size: 1.08rem;
+    margin: 8px 0;
+    background: #444;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  /* Mobile settings button style */
+  .settings-btn {
+    background: none;
+    font-size: 1.13rem;
+    color: #fff;
+    border: none;
+    margin: 8px 0;
+    text-align: left;
+  }
+
+  /* Mobile welcome text */
+  .mobile-welcome {
+    display: block;
+    background: #634b38aa;
+    color: #fff;
+    border-radius: 8px;
+    margin: 14px 0;
+    padding: 7px 0;
+    text-align: center;
+    font-weight: bold;
+    width: 100%;
+    user-select: none;
+  }
+
+  /* Mobile stats display */
+  .mobile-stats {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  /* Hide desktop nav and header contents on mobile */
+  .desktop-header,
+  .nav,
+  .stats,
+  .left-group,
+  .settings-panel,
+  .settings-btn:not(.hamburger) {
+    display: none !important;
+  }
+}
+
+/* Desktop Styles - Show only on screens wider than 599px */
+@media (min-width: 600px) {
+  .mobile-header,
+  .mobile-menu {
+    display: none !important;
+  }
+  .desktop-header {
+    display: flex !important;
+  }
+}
+
+/* Brand styling */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+/* Brand logo color and style */
+.brand-logo {
+  font-size: 22px;
+  color: var(--gold);
+  text-shadow: 0 0 12px rgba(212, 167, 119, 0.6);
+}
+
+/* Brand text style */
+.brand-text {
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+/* Tablet Styles - Between 600px and 1023px */
+@media (min-width: 600px) and (max-width: 1023px) {
+  body,
+  #root,
+  #app-root {
+    padding: 20px;
+    font-size: 16px;
+  }
+  header.topbar {
+    flex-wrap: wrap;
+  }
+  nav.nav {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  nav.nav button,
+  nav.nav .nav-btn {
+    flex: 1;
+    max-width: 180px;
+  }
+  .settings-panel {
+    width: 320px;
+  }
+  .card {
+    padding: 1.5em;
+  }
+}
+
+/* Desktop Styles - 1024px and up */
+@media (min-width: 1024px) {
+  body,
+  #root,
+  #app-root {
+    padding: 32px;
+    font-size: 18px;
+  }
+  header.topbar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  nav.nav {
+    display: flex;
+    gap: 20px;
+  }
+  nav.nav button,
+  nav.nav .nav-btn {
+    width: auto;
+    max-width: none;
+  }
+  .settings-panel {
+    width: 320px;
+  }
+  .card {
+    padding: 2em;
+  }
+}
